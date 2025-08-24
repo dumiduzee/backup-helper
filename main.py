@@ -5,3 +5,4 @@ app = FastAPI()
 
 #include user based routes
 app.include_router(prefix="/api/v1/user",router=user_router)
+
