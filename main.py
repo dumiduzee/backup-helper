@@ -1,6 +1,7 @@
 from fastapi import FastAPI,HTTPException,Request
 from fastapi.responses import JSONResponse
 from .api.user.routes import router as user_router
+from .api.settings import settings
 
 app = FastAPI()
 
@@ -14,3 +15,4 @@ async def exception_handler(request:Request,exc:HTTPException):
         status_code=exc.status_code,
         content={"detail" : exc.detail}
     )
+

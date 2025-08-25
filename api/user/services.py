@@ -1,4 +1,4 @@
 
 #login sevice
 def login_service(key,db):
-    pass
+    print(key,db)
