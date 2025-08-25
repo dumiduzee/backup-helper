@@ -1,4 +1,5 @@
 from pydantic import BaseModel,field_validator
+from .exceptions import ValueErrorr
 
 class LoginInputSchema(BaseModel):
     login_key : str 
@@ -6,7 +7,7 @@ class LoginInputSchema(BaseModel):
     @classmethod
     def validate_login_key(cls,v):
         if len(v) == 0:
-            pass
+            raise ValueErrorr(detail="Login key cannot be empty")
         if len(v) < 8:
-            pass
+            raise ValueErrorr(detail="Seems to be a invalid login key")
         return v
