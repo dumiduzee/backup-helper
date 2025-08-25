@@ -76,6 +76,14 @@
         "documentation": {}
     },
     {
+        "label": "Request",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
         "label": "FastAPI",
         "importPath": "fastapi",
         "description": "fastapi",
@@ -172,11 +180,51 @@
         "documentation": {}
     },
     {
+        "label": "Limiter",
+        "importPath": "slowapi",
+        "description": "slowapi",
+        "isExtraImport": true,
+        "detail": "slowapi",
+        "documentation": {}
+    },
+    {
+        "label": "_rate_limit_exceeded_handler",
+        "importPath": "slowapi",
+        "description": "slowapi",
+        "isExtraImport": true,
+        "detail": "slowapi",
+        "documentation": {}
+    },
+    {
+        "label": "get_remote_address",
+        "importPath": "slowapi.util",
+        "description": "slowapi.util",
+        "isExtraImport": true,
+        "detail": "slowapi.util",
+        "documentation": {}
+    },
+    {
         "label": "JSONResponse",
         "importPath": "fastapi.responses",
         "description": "fastapi.responses",
         "isExtraImport": true,
         "detail": "fastapi.responses",
+        "documentation": {}
+    },
+    {
+        "label": "RateLimitExceeded",
+        "importPath": "slowapi.errors",
+        "description": "slowapi.errors",
+        "isExtraImport": true,
+        "detail": "slowapi.errors",
+        "documentation": {}
+    },
+    {
+        "label": "SlowAPIMiddleware",
+        "importPath": "slowapi.middleware",
+        "description": "slowapi.middleware",
+        "isExtraImport": true,
+        "detail": "slowapi.middleware",
         "documentation": {}
     },
     {
@@ -292,7 +340,7 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def user_login(login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result",
+        "peekOfCode": "def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -301,7 +349,7 @@
         "kind": 5,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@router.post(\"/login\")\ndef user_login(login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result",
+        "peekOfCode": "router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -351,12 +399,30 @@
         "documentation": {}
     },
     {
+        "label": "limiter",
+        "kind": 5,
+        "importPath": "limiter",
+        "description": "limiter",
+        "peekOfCode": "limiter = Limiter(key_func=get_remote_address)",
+        "detail": "limiter",
+        "documentation": {}
+    },
+    {
         "label": "app",
         "kind": 5,
-        "importPath": "main",
-        "description": "main",
-        "peekOfCode": "app = FastAPI()\n#include user based routes\napp.include_router(prefix=\"/api/v1/user\",router=user_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):\n    return JSONResponse(\n        status_code=exc.status_code,\n        content={\"detail\" : exc.detail}\n    )",
-        "detail": "main",
+        "importPath": "server",
+        "description": "server",
+        "peekOfCode": "app = FastAPI()\n# Add SlowAPI middleware\napp.add_middleware(SlowAPIMiddleware)\n#rate limiter handler\napp.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/user\",router=user_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):",
+        "detail": "server",
+        "documentation": {}
+    },
+    {
+        "label": "app.state.limiter",
+        "kind": 5,
+        "importPath": "server",
+        "description": "server",
+        "peekOfCode": "app.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/user\",router=user_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):\n    return JSONResponse(\n        status_code=exc.status_code,\n        content={\"detail\" : exc.detail}\n    )",
+        "detail": "server",
         "documentation": {}
     }
 ]
