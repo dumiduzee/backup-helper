@@ -100,11 +100,11 @@
         "documentation": {}
     },
     {
-        "label": "Annotated",
-        "importPath": "typing",
-        "description": "typing",
+        "label": "Client",
+        "importPath": "supabase",
+        "description": "supabase",
         "isExtraImport": true,
-        "detail": "typing",
+        "detail": "supabase",
         "documentation": {}
     },
     {
@@ -129,6 +129,14 @@
         "description": "supabase",
         "isExtraImport": true,
         "detail": "supabase",
+        "documentation": {}
+    },
+    {
+        "label": "Annotated",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
         "documentation": {}
     },
     {
@@ -257,8 +265,26 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class ValueErrorr(HTTPException):\n    def __init__(self, status_code=status.HTTP_400_BAD_REQUEST, detail = None):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class ValueErrorr(HTTPException):\n    def __init__(self, status_code=status.HTTP_400_BAD_REQUEST, detail = None):\n        super().__init__(status_code, detail)\nclass UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)",
         "detail": "api.user.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "UnauthorizedKey",
+        "kind": 6,
+        "importPath": "api.user.exceptions",
+        "description": "api.user.exceptions",
+        "peekOfCode": "class UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)",
+        "detail": "api.user.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "get_user_repo",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def get_user_repo(key,db:Client):\n    querry = db.table(\"users\").select(\"*\").eq(\"key\",key[\"login_key\"])\n    result = querry.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return result.data[0]",
+        "detail": "api.user.repo",
         "documentation": {}
     },
     {
@@ -266,7 +292,7 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def user_login(login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    login_service(login_key.model_dump(),db)\n    #get username and user type\n    #return the details\n    pass",
+        "peekOfCode": "def user_login(login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -275,7 +301,7 @@
         "kind": 5,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@router.post(\"/login\")\ndef user_login(login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    login_service(login_key.model_dump(),db)\n    #get username and user type\n    #return the details\n    pass",
+        "peekOfCode": "router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@router.post(\"/login\")\ndef user_login(login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -293,7 +319,7 @@
         "kind": 2,
         "importPath": "api.user.services",
         "description": "api.user.services",
-        "peekOfCode": "def login_service(key,db):\n    print(key,db)",
+        "peekOfCode": "def login_service(key,db):\n    #check the key in database\n    result = get_user_repo(key=key,db=db)\n    if result is None:\n        #user not have invalid key situation\n        raise UnauthorizedKey(detail=\"This is not a valid key\")\n    else:\n        #user valid return the name and user type\n        return {\n            \"name\":result[\"name\"],",
         "detail": "api.user.services",
         "documentation": {}
     },

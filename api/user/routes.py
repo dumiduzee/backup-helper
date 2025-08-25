@@ -1,4 +1,5 @@
 from fastapi import APIRouter,Depends
+from .exceptions import ValueErrorr
 from .services import login_service
 from ..db import get_db
 from .schemas import LoginInputSchema
@@ -12,7 +13,8 @@ router = APIRouter(tags=["user"])
 @router.post("/login")
 def user_login(login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):
     #pass the key into service layer
-    login_service(login_key.model_dump(),db)
-    #get username and user type
+    result = login_service(login_key.model_dump(),db)
     #return the details
-    pass
+    if result is None:
+        raise ValueErrorr(detail="Something went wrong while validating key")
+    return result
