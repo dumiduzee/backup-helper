@@ -45,3 +45,19 @@ def delete_config_based_on_id(id,db:Client):
     else:
         return True
     
+#get client based on name
+def getcliet_based_on_name(name,db:Client):
+    q = db.table("users").select("*").eq("name",name["client_name"])
+    result = q.execute()
+    if len(result.data) == 0:
+        return True
+    return False
+
+#add client to the system
+def add_client_to_system(client,db:Client):
+    q = db.table("users").insert({"name":client["client_name"],"key":client["key"]})
+    result = q.execute()
+    if len(result.data) == 0:
+        return False
+    return True
+    

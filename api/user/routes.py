@@ -1,10 +1,10 @@
 from fastapi import Depends,APIRouter,status,Request
 from ...limiter import limiter  # <-- updated import
 from .exceptions import ConfigCreationException, DeleteConfigException, ValueErrorr
-from .services import (create_config_service, delete_config_service, get_configs_service,
-    login_service)
+from .services import (add_new_client_service, create_config_service, delete_config_service,
+    get_configs_service, login_service)
 from ..db import get_db
-from .schemas import ConfigCreateSchema, LoginInputSchema, response
+from .schemas import AddNewClientSchema, ConfigCreateSchema, LoginInputSchema, response
 from typing import Annotated
 from supabase import Client
 
@@ -73,6 +73,8 @@ def delete_configs(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):
 
 #add new user to the system
 @admin_router.post("/add-client")
-@limiter.limit("30/minute")
-def add_client(request:Request,db:Annotated[Client,Depends(get_db)]):
+@limiter.limit("2/minute")
+def add_client(request:Request,client_name:AddNewClientSchema,db:Annotated[Client,Depends(get_db)]):
+    #pass the client name to service layer
+    result = add_new_client_service(client_name.model_dump(),db)
     pass

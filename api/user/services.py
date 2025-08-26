@@ -1,8 +1,11 @@
 from fastapi import status
-from .exceptions import DeleteConfigException, UnauthorizedKey
-from .repo import (check_config_repo_by_id, create_config_repo, delete_config_based_on_id,
-    get_configs_repo, get_user_repo)
+from .utils import send_sms
+from .exceptions import AddClientexception, DeleteConfigException, UnauthorizedKey
+from .repo import (add_client_to_system, check_config_repo_by_id, create_config_repo,
+    delete_config_based_on_id, get_configs_repo, get_user_repo, getcliet_based_on_name)
 import uuid
+import random
+import string
 
 #login sevice
 def login_service(key,db):
@@ -49,3 +52,20 @@ def delete_config_service(id,db):
             return False
     else:
         raise DeleteConfigException(status_code=status.HTTP_400_BAD_REQUEST,detail="Selected config not found!") 
+
+
+#add new client to the system
+def add_new_client_service(client_name,db):
+    #check that client already exists
+    result = getcliet_based_on_name(client_name,db=db)
+    if result is False:
+        raise AddClientexception(status_code=status.HTTP_404_NOT_FOUND,detail="User already exists")
+    #genarate key for the client
+    key = uuid.uuid4().hex.upper()[0:6]
+    client_name["key"] = key
+    #add client to the system
+    result = add_client_to_system(client=client_name,db=db)
+    #send key and name to the admins phone number
+    if result:
+        send_sms(key=key,name=client_name["client_name"])
+    

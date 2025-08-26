@@ -25,3 +25,7 @@ class LoginInputSchema(BaseModel):
 class ConfigCreateSchema(BaseModel):
     config_name : str = Field(...,examples=["Airtel"])
     config : str = Field(...,examples=["vless:://....."])
+
+#schema for adding new client to the system
+class AddNewClientSchema(BaseModel):
+    client_name:str = Field(...,examples=["Dumidu"])

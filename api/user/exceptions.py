@@ -17,3 +17,9 @@ class ConfigCreationException(HTTPException):
 class DeleteConfigException(HTTPException):
     def __init__(self, status_code=None, detail = None):
         super().__init__(status_code, detail)
+
+
+#add client exceptions
+class AddClientexception(HTTPException):
+    def __init__(self, status_code=None, detail = None):
+        super().__init__(status_code, detail)

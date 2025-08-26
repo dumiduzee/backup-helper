@@ -205,6 +205,33 @@
         "documentation": {}
     },
     {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "string",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "string",
+        "description": "string",
+        "detail": "string",
+        "documentation": {}
+    },
+    {
+        "label": "requests",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "requests",
+        "description": "requests",
+        "detail": "requests",
+        "documentation": {}
+    },
+    {
         "label": "BaseSettings",
         "importPath": "pydantic_settings",
         "description": "pydantic_settings",
@@ -372,7 +399,7 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)\n#delete config exceptions\nclass DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)\n#delete config exceptions\nclass DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)\n#add client exceptions\nclass AddClientexception(HTTPException):\n    def __init__(self, status_code=None, detail = None):",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -381,7 +408,16 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)\n#add client exceptions\nclass AddClientexception(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
+        "detail": "api.user.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "AddClientexception",
+        "kind": 6,
+        "importPath": "api.user.exceptions",
+        "description": "api.user.exceptions",
+        "peekOfCode": "class AddClientexception(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -426,7 +462,25 @@
         "kind": 2,
         "importPath": "api.user.repo",
         "description": "api.user.repo",
-        "peekOfCode": "def delete_config_based_on_id(id,db:Client):\n    q = db.table(\"configs\").delete().eq(\"id\",id)\n    result = q.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return True",
+        "peekOfCode": "def delete_config_based_on_id(id,db:Client):\n    q = db.table(\"configs\").delete().eq(\"id\",id)\n    result = q.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return True\n#get client based on name\ndef getcliet_based_on_name(name,db:Client):\n    q = db.table(\"users\").select(\"*\").eq(\"name\",name[\"client_name\"])",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "getcliet_based_on_name",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def getcliet_based_on_name(name,db:Client):\n    q = db.table(\"users\").select(\"*\").eq(\"name\",name[\"client_name\"])\n    result = q.execute()\n    if len(result.data) == 0:\n        return True\n    return False\n#add client to the system\ndef add_client_to_system(client,db:Client):\n    q = db.table(\"users\").insert({\"name\":client[\"client_name\"],\"key\":client[\"key\"]})\n    result = q.execute()",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "add_client_to_system",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def add_client_to_system(client,db:Client):\n    q = db.table(\"users\").insert({\"name\":client[\"client_name\"],\"key\":client[\"key\"]})\n    result = q.execute()\n    if len(result.data) == 0:\n        return False\n    return True",
         "detail": "api.user.repo",
         "documentation": {}
     },
@@ -471,7 +525,7 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def delete_configs(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):\n    result = delete_config_service(id,db)\n    if result:\n        return response(message=\"Config deleted!\",data=None)\n    raise DeleteConfigException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=\"Something went wrong while deleting the config!\")\n#add new user to the system\n@admin_router.post(\"/add-client\")\n@limiter.limit(\"30/minute\")\ndef add_client(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass",
+        "peekOfCode": "def delete_configs(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):\n    result = delete_config_service(id,db)\n    if result:\n        return response(message=\"Config deleted!\",data=None)\n    raise DeleteConfigException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=\"Something went wrong while deleting the config!\")\n#add new user to the system\n@admin_router.post(\"/add-client\")\n@limiter.limit(\"2/minute\")\ndef add_client(request:Request,client_name:AddNewClientSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the client name to service layer",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -480,7 +534,7 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def add_client(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass",
+        "peekOfCode": "def add_client(request:Request,client_name:AddNewClientSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the client name to service layer\n    result = add_new_client_service(client_name.model_dump(),db)\n    pass",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -534,7 +588,16 @@
         "kind": 6,
         "importPath": "api.user.schemas",
         "description": "api.user.schemas",
-        "peekOfCode": "class ConfigCreateSchema(BaseModel):\n    config_name : str = Field(...,examples=[\"Airtel\"])\n    config : str = Field(...,examples=[\"vless:://.....\"])",
+        "peekOfCode": "class ConfigCreateSchema(BaseModel):\n    config_name : str = Field(...,examples=[\"Airtel\"])\n    config : str = Field(...,examples=[\"vless:://.....\"])\n#schema for adding new client to the system\nclass AddNewClientSchema(BaseModel):\n    client_name:str = Field(...,examples=[\"Dumidu\"])",
+        "detail": "api.user.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "AddNewClientSchema",
+        "kind": 6,
+        "importPath": "api.user.schemas",
+        "description": "api.user.schemas",
+        "peekOfCode": "class AddNewClientSchema(BaseModel):\n    client_name:str = Field(...,examples=[\"Dumidu\"])",
         "detail": "api.user.schemas",
         "documentation": {}
     },
@@ -575,6 +638,69 @@
         "documentation": {}
     },
     {
+        "label": "add_new_client_service",
+        "kind": 2,
+        "importPath": "api.user.services",
+        "description": "api.user.services",
+        "peekOfCode": "def add_new_client_service(client_name,db):\n    #check that client already exists\n    result = getcliet_based_on_name(client_name,db=db)\n    if result is False:\n        raise AddClientexception(status_code=status.HTTP_404_NOT_FOUND,detail=\"User already exists\")\n    #genarate key for the client\n    key = uuid.uuid4().hex.upper()[0:6]\n    client_name[\"key\"] = key\n    #add client to the system\n    result = add_client_to_system(client=client_name,db=db)",
+        "detail": "api.user.services",
+        "documentation": {}
+    },
+    {
+        "label": "send_sms",
+        "kind": 2,
+        "importPath": "api.user.utils",
+        "description": "api.user.utils",
+        "peekOfCode": "def send_sms(key:str,name:str):\n    params = {\n\t\"recipient\":f\"94{ADMIN_NUMBER}\",\n\t\"sender_id\":SENDER_ID,\n\t\"type\":\"plain\",\n\t\"message\":f\"TOKEN FOR {name} - {key}\",\n    }\n    headers = {\n        \"Authorization\": f\"Bearer {API_TOKEN}\",\n        \"Content-Type\" : \"application/json\",",
+        "detail": "api.user.utils",
+        "documentation": {}
+    },
+    {
+        "label": "ADMIN_NUMBER",
+        "kind": 5,
+        "importPath": "api.user.utils",
+        "description": "api.user.utils",
+        "peekOfCode": "ADMIN_NUMBER = settings.ADMIN_MOBILE\nBASE_URL = settings.BASE_URL\nAPI_TOKEN = settings.API_TOKEN\nSENDER_ID = settings.SENDER_ID\nURL_PATH = \"api/v3/sms/send\"\n#send sms function\ndef send_sms(key:str,name:str):\n    params = {\n\t\"recipient\":f\"94{ADMIN_NUMBER}\",\n\t\"sender_id\":SENDER_ID,",
+        "detail": "api.user.utils",
+        "documentation": {}
+    },
+    {
+        "label": "BASE_URL",
+        "kind": 5,
+        "importPath": "api.user.utils",
+        "description": "api.user.utils",
+        "peekOfCode": "BASE_URL = settings.BASE_URL\nAPI_TOKEN = settings.API_TOKEN\nSENDER_ID = settings.SENDER_ID\nURL_PATH = \"api/v3/sms/send\"\n#send sms function\ndef send_sms(key:str,name:str):\n    params = {\n\t\"recipient\":f\"94{ADMIN_NUMBER}\",\n\t\"sender_id\":SENDER_ID,\n\t\"type\":\"plain\",",
+        "detail": "api.user.utils",
+        "documentation": {}
+    },
+    {
+        "label": "API_TOKEN",
+        "kind": 5,
+        "importPath": "api.user.utils",
+        "description": "api.user.utils",
+        "peekOfCode": "API_TOKEN = settings.API_TOKEN\nSENDER_ID = settings.SENDER_ID\nURL_PATH = \"api/v3/sms/send\"\n#send sms function\ndef send_sms(key:str,name:str):\n    params = {\n\t\"recipient\":f\"94{ADMIN_NUMBER}\",\n\t\"sender_id\":SENDER_ID,\n\t\"type\":\"plain\",\n\t\"message\":f\"TOKEN FOR {name} - {key}\",",
+        "detail": "api.user.utils",
+        "documentation": {}
+    },
+    {
+        "label": "SENDER_ID",
+        "kind": 5,
+        "importPath": "api.user.utils",
+        "description": "api.user.utils",
+        "peekOfCode": "SENDER_ID = settings.SENDER_ID\nURL_PATH = \"api/v3/sms/send\"\n#send sms function\ndef send_sms(key:str,name:str):\n    params = {\n\t\"recipient\":f\"94{ADMIN_NUMBER}\",\n\t\"sender_id\":SENDER_ID,\n\t\"type\":\"plain\",\n\t\"message\":f\"TOKEN FOR {name} - {key}\",\n    }",
+        "detail": "api.user.utils",
+        "documentation": {}
+    },
+    {
+        "label": "URL_PATH",
+        "kind": 5,
+        "importPath": "api.user.utils",
+        "description": "api.user.utils",
+        "peekOfCode": "URL_PATH = \"api/v3/sms/send\"\n#send sms function\ndef send_sms(key:str,name:str):\n    params = {\n\t\"recipient\":f\"94{ADMIN_NUMBER}\",\n\t\"sender_id\":SENDER_ID,\n\t\"type\":\"plain\",\n\t\"message\":f\"TOKEN FOR {name} - {key}\",\n    }\n    headers = {",
+        "detail": "api.user.utils",
+        "documentation": {}
+    },
+    {
         "label": "get_db",
         "kind": 2,
         "importPath": "api.db",
@@ -588,7 +714,7 @@
         "kind": 6,
         "importPath": "api.settings",
         "description": "api.settings",
-        "peekOfCode": "class Settings(BaseSettings):\n    SUPABASE_URL :str =  config(\"SUPABASE_URL\")\n    SUPABASE_KEY :str = config(\"SUPABASE_KEY\")\nsettings = Settings()",
+        "peekOfCode": "class Settings(BaseSettings):\n    SUPABASE_URL :str =  config(\"SUPABASE_URL\")\n    SUPABASE_KEY :str = config(\"SUPABASE_KEY\")\n    ADMIN_MOBILE : str = config(\"ADMIN_MOBILE\")\n    BASE_URL : str = config(\"BASE_URL\")\n    API_TOKEN :str = config(\"API_TOKEN\")\n    SENDER_ID :str = config(\"SENDER_ID\")\nsettings = Settings()",
         "detail": "api.settings",
         "documentation": {}
     },
