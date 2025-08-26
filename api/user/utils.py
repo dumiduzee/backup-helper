@@ -22,7 +22,11 @@ def send_sms(key:str,name:str):
         "Content-Type" : "application/json",
         "Accept" : "application/json"
     }
-   
-
-    request = requests.post(url=BASE_URL+URL_PATH,json=params,headers=headers)
-    print(request.json())
+    try:
+        request = requests.post(url=BASE_URL+URL_PATH,json=params,headers=headers)
+        result = request.json()
+        if result["status"] == "success":
+            return True
+        return False
+    except Exception:
+        return False

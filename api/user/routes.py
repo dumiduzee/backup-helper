@@ -1,6 +1,7 @@
 from fastapi import Depends,APIRouter,status,Request
 from ...limiter import limiter  # <-- updated import
-from .exceptions import ConfigCreationException, DeleteConfigException, ValueErrorr
+from .exceptions import (AddClientexception, ConfigCreationException, DeleteConfigException,
+    ValueErrorr)
 from .services import (add_new_client_service, create_config_service, delete_config_service,
     get_configs_service, login_service)
 from ..db import get_db
@@ -77,4 +78,6 @@ def delete_configs(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):
 def add_client(request:Request,client_name:AddNewClientSchema,db:Annotated[Client,Depends(get_db)]):
     #pass the client name to service layer
     result = add_new_client_service(client_name.model_dump(),db)
-    pass
+    if result:
+        return response(message="client added!",data=None)
+    raise AddClientexception(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Something went wrong in our side")

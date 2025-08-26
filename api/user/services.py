@@ -67,5 +67,10 @@ def add_new_client_service(client_name,db):
     result = add_client_to_system(client=client_name,db=db)
     #send key and name to the admins phone number
     if result:
-        send_sms(key=key,name=client_name["client_name"])
+        sms_result = send_sms(key=key,name=client_name["client_name"])
+        if sms_result:
+            return True
+        return False
+
+
     
