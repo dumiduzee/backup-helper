@@ -20,3 +20,9 @@ def create_config_repo(config,db:Client):
         return True
     else:
         return False
+    
+#get all configs on db
+def get_configs_repo(db:Client):
+    quesry = db.table("configs").select("*")
+    result = quesry.execute()
+    return result

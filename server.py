@@ -1,5 +1,6 @@
 from fastapi import FastAPI,HTTPException,Request
 from fastapi.responses import JSONResponse
+from .api.user.routes import user_router
 from .api.user.routes import auth_router 
 from .api.user.routes import admin_router
 from .api.settings import settings
@@ -21,6 +22,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 #include user based routes
 app.include_router(prefix="/api/v1/auth",router=auth_router)
 app.include_router(prefix="/api/v1/admin",router=admin_router)
+app.include_router(prefix="/api/v1/user",router=user_router)
 
 @app.exception_handler(HTTPException)
 async def exception_handler(request:Request,exc:HTTPException):

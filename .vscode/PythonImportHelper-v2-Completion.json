@@ -148,6 +148,14 @@
         "documentation": {}
     },
     {
+        "label": "Any",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
         "label": "BaseModel",
         "importPath": "pydantic",
         "description": "pydantic",
@@ -357,7 +365,16 @@
         "kind": 2,
         "importPath": "api.user.repo",
         "description": "api.user.repo",
-        "peekOfCode": "def create_config_repo(config,db:Client):\n    query = db.table(\"configs\").insert(config)\n    result = query.execute()\n    if len(result.data) > 0:\n        #succussfully added data\n        return True\n    else:\n        return False",
+        "peekOfCode": "def create_config_repo(config,db:Client):\n    query = db.table(\"configs\").insert(config)\n    result = query.execute()\n    if len(result.data) > 0:\n        #succussfully added data\n        return True\n    else:\n        return False\n#get all configs on db\ndef get_configs_repo(db:Client):",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "get_configs_repo",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def get_configs_repo(db:Client):\n    quesry = db.table(\"configs\").select(\"*\")\n    result = quesry.execute()\n    return result",
         "detail": "api.user.repo",
         "documentation": {}
     },
@@ -366,7 +383,16 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result\n#=====================admin routes===========================================\n#add config to the system\n@admin_router.post(\"/\")",
+        "peekOfCode": "def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result\n#=====================user routes===========================================\n#get all available configs\n@user_router.get(\"/\")",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_configs",
+        "kind": 2,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "def get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass\n    #pass request to service layer\n    result = get_configs_service(db=db)\n    if result:\n        return response(message=\"Configs fetch done\",data=result.data)\n    return response(message=\"No any available configs\")\n#=====================admin routes===========================================\n#add config to the system\n@admin_router.post(\"/\")",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -375,7 +401,16 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def create_config(request:Request,config:ConfigCreateSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass config data to service layer\n    result = create_config_service(config=config.model_dump(),db=db)\n    if result:\n        return response(message=\"Config creation succuss!!\")\n    raise ConfigCreationException()",
+        "peekOfCode": "def create_config(request:Request,config:ConfigCreateSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass config data to service layer\n    result = create_config_service(config=config.model_dump(),db=db)\n    if result:\n        return response(message=\"Config creation succuss!!\")\n    raise ConfigCreationException()\n#get all available configs\n@admin_router.get(\"/\")\n@limiter.limit(\"30/minute\")\ndef get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_configs",
+        "kind": 2,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "def get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass\n    #pass request to service layer\n    result = get_configs_service(db=db)\n    if result:\n        return response(message=\"Configs fetch done\",data=result.data)\n    return response(message=\"No any available configs\")",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -384,7 +419,7 @@
         "kind": 5,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "auth_router = APIRouter(tags=[\"login\"])\nadmin_router = APIRouter(tags=[\"admin\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:",
+        "peekOfCode": "auth_router = APIRouter(tags=[\"login\"])\nadmin_router = APIRouter(tags=[\"admin\"])\nuser_router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -393,7 +428,16 @@
         "kind": 5,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "admin_router = APIRouter(tags=[\"admin\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")",
+        "peekOfCode": "admin_router = APIRouter(tags=[\"admin\"])\nuser_router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "user_router",
+        "kind": 5,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "user_router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -402,7 +446,7 @@
         "kind": 6,
         "importPath": "api.user.schemas",
         "description": "api.user.schemas",
-        "peekOfCode": "class response(BaseModel):\n    succuss:bool = Field(default=True)\n    message:str\n#Schema for the login data\nclass LoginInputSchema(BaseModel):\n    login_key : str \n    @field_validator(\"login_key\")\n    @classmethod\n    def validate_login_key(cls,v):\n        if len(v) == 0:",
+        "peekOfCode": "class response(BaseModel):\n    succuss:bool = Field(default=True)\n    message:str\n    data : Any\n#Schema for the login data\nclass LoginInputSchema(BaseModel):\n    login_key : str \n    @field_validator(\"login_key\")\n    @classmethod\n    def validate_login_key(cls,v):",
         "detail": "api.user.schemas",
         "documentation": {}
     },
@@ -438,7 +482,16 @@
         "kind": 2,
         "importPath": "api.user.services",
         "description": "api.user.services",
-        "peekOfCode": "def create_config_service(config,db):\n    #pass the data to repo layer\n    result = create_config_repo(config,db)\n    return result",
+        "peekOfCode": "def create_config_service(config,db):\n    #pass the data to repo layer\n    result = create_config_repo(config,db)\n    return result\n#get all configs\ndef get_configs_service(db):\n    result = get_configs_repo(db=db)\n    if len(result.data) == 0:\n        return None\n    return result",
+        "detail": "api.user.services",
+        "documentation": {}
+    },
+    {
+        "label": "get_configs_service",
+        "kind": 2,
+        "importPath": "api.user.services",
+        "description": "api.user.services",
+        "peekOfCode": "def get_configs_service(db):\n    result = get_configs_repo(db=db)\n    if len(result.data) == 0:\n        return None\n    return result",
         "detail": "api.user.services",
         "documentation": {}
     },
@@ -483,7 +536,7 @@
         "kind": 5,
         "importPath": "server",
         "description": "server",
-        "peekOfCode": "app = FastAPI()\n# Add SlowAPI middleware\napp.add_middleware(SlowAPIMiddleware)\n#rate limiter handler\napp.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/auth\",router=auth_router)\napp.include_router(prefix=\"/api/v1/admin\",router=admin_router)\n@app.exception_handler(HTTPException)",
+        "peekOfCode": "app = FastAPI()\n# Add SlowAPI middleware\napp.add_middleware(SlowAPIMiddleware)\n#rate limiter handler\napp.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/auth\",router=auth_router)\napp.include_router(prefix=\"/api/v1/admin\",router=admin_router)\napp.include_router(prefix=\"/api/v1/user\",router=user_router)",
         "detail": "server",
         "documentation": {}
     },
@@ -492,7 +545,7 @@
         "kind": 5,
         "importPath": "server",
         "description": "server",
-        "peekOfCode": "app.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/auth\",router=auth_router)\napp.include_router(prefix=\"/api/v1/admin\",router=admin_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):\n    return JSONResponse(\n        status_code=exc.status_code,\n        content={\"detail\" : exc.detail}",
+        "peekOfCode": "app.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/auth\",router=auth_router)\napp.include_router(prefix=\"/api/v1/admin\",router=admin_router)\napp.include_router(prefix=\"/api/v1/user\",router=user_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):\n    return JSONResponse(\n        status_code=exc.status_code,",
         "detail": "server",
         "documentation": {}
     }

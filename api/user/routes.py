@@ -1,7 +1,7 @@
 from fastapi import APIRouter,Depends,Request
 from ...limiter import limiter  # <-- updated import
 from .exceptions import ConfigCreationException, ValueErrorr
-from .services import create_config_service, login_service
+from .services import create_config_service, get_configs_service, login_service
 from ..db import get_db
 from .schemas import ConfigCreateSchema, LoginInputSchema, response
 from typing import Annotated
@@ -10,6 +10,7 @@ from supabase import Client
 #router for user based routes
 auth_router = APIRouter(tags=["login"])
 admin_router = APIRouter(tags=["admin"])
+user_router = APIRouter(tags=["user"])
 
 
 #login endpoint to both user and admin
@@ -23,6 +24,19 @@ def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,De
         raise ValueErrorr(detail="Something went wrong while validating key")
     return result
 
+#=====================user routes===========================================
+
+#get all available configs
+@user_router.get("/")
+@limiter.limit("30/minute")
+def get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):
+    pass
+    #pass request to service layer
+    result = get_configs_service(db=db)
+    if result:
+        return response(message="Configs fetch done",data=result.data)
+    return response(message="No any available configs")
+
 #=====================admin routes===========================================
 
 #add config to the system
@@ -34,3 +48,14 @@ def create_config(request:Request,config:ConfigCreateSchema,db:Annotated[Client,
     if result:
         return response(message="Config creation succuss!!")
     raise ConfigCreationException()
+
+#get all available configs
+@admin_router.get("/")
+@limiter.limit("30/minute")
+def get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):
+    pass
+    #pass request to service layer
+    result = get_configs_service(db=db)
+    if result:
+        return response(message="Configs fetch done",data=result.data)
+    return response(message="No any available configs")
