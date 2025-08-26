@@ -8,10 +8,12 @@ from typing import Annotated
 from supabase import Client
 
 #router for user based routes
-router = APIRouter(tags=["user"])
+auth_router = APIRouter(tags=["login"])
+admin_router = APIRouter(tags=["admin"])
+
 
 #login endpoint to both user and admin
-@router.post("/login")
+@auth_router.post("/login")
 @limiter.limit("5/minute")
 def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):
     #pass the key into service layer
@@ -20,3 +22,11 @@ def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,De
     if result is None:
         raise ValueErrorr(detail="Something went wrong while validating key")
     return result
+
+#=====================admin routes===========================================
+
+#add config to the system
+@admin_router.post("/")
+@limiter.limit("30/minute")
+def create_config(request:Request,db:Annotated[Client,Depends(get_db)]):
+    pass

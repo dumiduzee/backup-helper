@@ -340,16 +340,34 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result",
+        "peekOfCode": "def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")\n    return result\n#=====================admin routes===========================================\n#add config to the system\n@admin_router.post(\"/\")",
         "detail": "api.user.routes",
         "documentation": {}
     },
     {
-        "label": "router",
+        "label": "create_config",
+        "kind": 2,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "def create_config(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "auth_router",
         "kind": 5,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "router = APIRouter(tags=[\"user\"])\n#login endpoint to both user and admin\n@router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")",
+        "peekOfCode": "auth_router = APIRouter(tags=[\"login\"])\nadmin_router = APIRouter(tags=[\"admin\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "admin_router",
+        "kind": 5,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "admin_router = APIRouter(tags=[\"admin\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -412,7 +430,7 @@
         "kind": 5,
         "importPath": "server",
         "description": "server",
-        "peekOfCode": "app = FastAPI()\n# Add SlowAPI middleware\napp.add_middleware(SlowAPIMiddleware)\n#rate limiter handler\napp.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/user\",router=user_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):",
+        "peekOfCode": "app = FastAPI()\n# Add SlowAPI middleware\napp.add_middleware(SlowAPIMiddleware)\n#rate limiter handler\napp.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/auth\",router=auth_router)\napp.include_router(prefix=\"/api/v1/admin\",router=admin_router)\n@app.exception_handler(HTTPException)",
         "detail": "server",
         "documentation": {}
     },
@@ -421,7 +439,7 @@
         "kind": 5,
         "importPath": "server",
         "description": "server",
-        "peekOfCode": "app.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/user\",router=user_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):\n    return JSONResponse(\n        status_code=exc.status_code,\n        content={\"detail\" : exc.detail}\n    )",
+        "peekOfCode": "app.state.limiter = limiter\napp.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)\n#include user based routes\napp.include_router(prefix=\"/api/v1/auth\",router=auth_router)\napp.include_router(prefix=\"/api/v1/admin\",router=admin_router)\n@app.exception_handler(HTTPException)\nasync def exception_handler(request:Request,exc:HTTPException):\n    return JSONResponse(\n        status_code=exc.status_code,\n        content={\"detail\" : exc.detail}",
         "detail": "server",
         "documentation": {}
     }
