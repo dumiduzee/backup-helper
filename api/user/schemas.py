@@ -1,6 +1,12 @@
 from pydantic import BaseModel,field_validator,Field
 from .exceptions import ValueErrorr
 
+
+#succuss response
+class response(BaseModel):
+    succuss:bool = Field(default=True)
+    message:str
+
 #Schema for the login data
 class LoginInputSchema(BaseModel):
     login_key : str 

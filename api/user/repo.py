@@ -10,3 +10,13 @@ def get_user_repo(key,db:Client):
     else:
         return result.data[0]
    
+
+#create config on db
+def create_config_repo(config,db:Client):
+    query = db.table("configs").insert(config)
+    result = query.execute()
+    if len(result.data) > 0:
+        #succussfully added data
+        return True
+    else:
+        return False

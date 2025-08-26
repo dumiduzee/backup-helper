@@ -321,7 +321,7 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class ValueErrorr(HTTPException):\n    def __init__(self, status_code=status.HTTP_400_BAD_REQUEST, detail = None):\n        super().__init__(status_code, detail)\nclass UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class ValueErrorr(HTTPException):\n    def __init__(self, status_code=status.HTTP_400_BAD_REQUEST, detail = None):\n        super().__init__(status_code, detail)\nclass UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)\n#config creation exceptions\nclass ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -330,7 +330,16 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)\n#config creation exceptions\nclass ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)",
+        "detail": "api.user.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "ConfigCreationException",
+        "kind": 6,
+        "importPath": "api.user.exceptions",
+        "description": "api.user.exceptions",
+        "peekOfCode": "class ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -339,7 +348,16 @@
         "kind": 2,
         "importPath": "api.user.repo",
         "description": "api.user.repo",
-        "peekOfCode": "def get_user_repo(key,db:Client):\n    querry = db.table(\"users\").select(\"*\").eq(\"key\",key[\"login_key\"])\n    result = querry.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return result.data[0]",
+        "peekOfCode": "def get_user_repo(key,db:Client):\n    querry = db.table(\"users\").select(\"*\").eq(\"key\",key[\"login_key\"])\n    result = querry.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return result.data[0]\n#create config on db\ndef create_config_repo(config,db:Client):\n    query = db.table(\"configs\").insert(config)",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "create_config_repo",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def create_config_repo(config,db:Client):\n    query = db.table(\"configs\").insert(config)\n    result = query.execute()\n    if len(result.data) > 0:\n        #succussfully added data\n        return True\n    else:\n        return False",
         "detail": "api.user.repo",
         "documentation": {}
     },
@@ -357,7 +375,7 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def create_config(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass",
+        "peekOfCode": "def create_config(request:Request,config:ConfigCreateSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass config data to service layer\n    result = create_config_service(config=config.model_dump(),db=db)\n    if result:\n        return response(message=\"Config creation succuss!!\")\n    raise ConfigCreationException()",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -377,6 +395,15 @@
         "description": "api.user.routes",
         "peekOfCode": "admin_router = APIRouter(tags=[\"admin\"])\n#login endpoint to both user and admin\n@auth_router.post(\"/login\")\n@limiter.limit(\"5/minute\")\ndef user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the key into service layer\n    result = login_service(login_key.model_dump(),db)\n    #return the details\n    if result is None:\n        raise ValueErrorr(detail=\"Something went wrong while validating key\")",
         "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "response",
+        "kind": 6,
+        "importPath": "api.user.schemas",
+        "description": "api.user.schemas",
+        "peekOfCode": "class response(BaseModel):\n    succuss:bool = Field(default=True)\n    message:str\n#Schema for the login data\nclass LoginInputSchema(BaseModel):\n    login_key : str \n    @field_validator(\"login_key\")\n    @classmethod\n    def validate_login_key(cls,v):\n        if len(v) == 0:",
+        "detail": "api.user.schemas",
         "documentation": {}
     },
     {
@@ -403,6 +430,15 @@
         "importPath": "api.user.services",
         "description": "api.user.services",
         "peekOfCode": "def login_service(key,db):\n    #check the key in database\n    result = get_user_repo(key=key,db=db)\n    if result is None:\n        #user not have invalid key situation\n        raise UnauthorizedKey(detail=\"This is not a valid key\")\n    else:\n        #user valid return the name and user type\n        return {\n            \"name\":result[\"name\"],",
+        "detail": "api.user.services",
+        "documentation": {}
+    },
+    {
+        "label": "create_config_service",
+        "kind": 2,
+        "importPath": "api.user.services",
+        "description": "api.user.services",
+        "peekOfCode": "def create_config_service(config,db):\n    #pass the data to repo layer\n    result = create_config_repo(config,db)\n    return result",
         "detail": "api.user.services",
         "documentation": {}
     },

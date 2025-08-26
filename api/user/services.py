@@ -1,5 +1,5 @@
 from .exceptions import UnauthorizedKey
-from .repo import get_user_repo
+from .repo import create_config_repo, get_user_repo
 
 #login sevice
 def login_service(key,db):
@@ -14,3 +14,9 @@ def login_service(key,db):
             "name":result["name"],
             "user_type":result["user_type"]
         }
+    
+#config create service
+def create_config_service(config,db):
+    #pass the data to repo layer
+    result = create_config_repo(config,db)
+    return result

@@ -1,9 +1,9 @@
 from fastapi import APIRouter,Depends,Request
 from ...limiter import limiter  # <-- updated import
-from .exceptions import ValueErrorr
-from .services import login_service
+from .exceptions import ConfigCreationException, ValueErrorr
+from .services import create_config_service, login_service
 from ..db import get_db
-from .schemas import LoginInputSchema
+from .schemas import ConfigCreateSchema, LoginInputSchema, response
 from typing import Annotated
 from supabase import Client
 
@@ -28,5 +28,9 @@ def user_login(request:Request,login_key:LoginInputSchema,db:Annotated[Client,De
 #add config to the system
 @admin_router.post("/")
 @limiter.limit("30/minute")
-def create_config(request:Request,db:Annotated[Client,Depends(get_db)]):
-    pass
+def create_config(request:Request,config:ConfigCreateSchema,db:Annotated[Client,Depends(get_db)]):
+    #pass config data to service layer
+    result = create_config_service(config=config.model_dump(),db=db)
+    if result:
+        return response(message="Config creation succuss!!")
+    raise ConfigCreationException()
