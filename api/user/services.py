@@ -1,7 +1,7 @@
 from fastapi import status
 from .utils import send_sms
-from .exceptions import AddClientexception, DeleteConfigException, UnauthorizedKey
-from .repo import (add_client_to_system, check_config_repo_by_id, create_config_repo,
+from .exceptions import AddClientexception, DeleteClientException, DeleteConfigException, UnauthorizedKey
+from .repo import (add_client_to_system, check_client_repo_by_id, check_config_repo_by_id, create_config_repo, delete_client_based_on_id,
     delete_config_based_on_id, get_configs_repo, get_user_repo, getcliet_based_on_name)
 import uuid
 import random
@@ -71,6 +71,25 @@ def add_new_client_service(client_name,db):
         if sms_result:
             return True
         return False
+
+#delete specific client from the system
+def delete_client_service(id,db):
+    #check that id is a valid id
+    try:
+        id = uuid.UUID(id)
+    except ValueError:
+        raise DeleteClientException(status_code=status.HTTP_400_BAD_REQUEST,detail="Malforemed client id.")
+    #check that id exists on the database
+    result = check_client_repo_by_id(id=id,db=db)
+    if result:
+        deleted = delete_client_based_on_id(id=id,db=db)
+        if deleted:
+            return deleted
+        else:
+            return False
+    else:
+        raise DeleteClientException(status_code=status.HTTP_400_BAD_REQUEST,detail="Selected client not found!")
+
 
 
     

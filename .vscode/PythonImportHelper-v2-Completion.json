@@ -408,7 +408,7 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)\n#add client exceptions\nclass AddClientexception(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)\n#add client exceptions\nclass AddClientexception(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)\n#delete client exceptions\nclass DeleteClientException(HTTPException):\n    def __init__(self, status_code=None, detail = None):",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -417,7 +417,16 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class AddClientexception(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class AddClientexception(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)\n#delete client exceptions\nclass DeleteClientException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
+        "detail": "api.user.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "DeleteClientException",
+        "kind": 6,
+        "importPath": "api.user.exceptions",
+        "description": "api.user.exceptions",
+        "peekOfCode": "class DeleteClientException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -480,7 +489,25 @@
         "kind": 2,
         "importPath": "api.user.repo",
         "description": "api.user.repo",
-        "peekOfCode": "def add_client_to_system(client,db:Client):\n    q = db.table(\"users\").insert({\"name\":client[\"client_name\"],\"key\":client[\"key\"]})\n    result = q.execute()\n    if len(result.data) == 0:\n        return False\n    return True",
+        "peekOfCode": "def add_client_to_system(client,db:Client):\n    q = db.table(\"users\").insert({\"name\":client[\"client_name\"],\"key\":client[\"key\"]})\n    result = q.execute()\n    if len(result.data) == 0:\n        return False\n    return True\n#check client availability based on id\ndef check_client_repo_by_id(id,db:Client):\n    q = db.table(\"users\").select(\"*\").eq(\"id\",id)\n    result = q.execute()",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "check_client_repo_by_id",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def check_client_repo_by_id(id,db:Client):\n    q = db.table(\"users\").select(\"*\").eq(\"id\",id)\n    result = q.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return True\n#delete client based on id\ndef delete_client_based_on_id(id,db:Client):\n    q = db.table(\"users\").delete().eq(\"id\",id)",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "delete_client_based_on_id",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def delete_client_based_on_id(id,db:Client):\n    q = db.table(\"users\").delete().eq(\"id\",id)\n    result = q.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return True",
         "detail": "api.user.repo",
         "documentation": {}
     },
@@ -534,7 +561,16 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def add_client(request:Request,client_name:AddNewClientSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the client name to service layer\n    result = add_new_client_service(client_name.model_dump(),db)\n    if result:\n        return response(message=\"client added!\",data=None)\n    raise AddClientexception(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=\"Something went wrong in our side\")",
+        "peekOfCode": "def add_client(request:Request,client_name:AddNewClientSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass the client name to service layer\n    result = add_new_client_service(client_name.model_dump(),db)\n    if result:\n        return response(message=\"client added!\",data=None)\n    raise AddClientexception(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=\"Something went wrong in our side\")\n#delete specific user from the system\n@admin_router.delete(\"/delete-client/{id}\")\n@limiter.limit(\"2/minute\")\ndef delete_client(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "delete_client",
+        "kind": 2,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "def delete_client(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):\n    result = delete_client_service(id,db)\n    if result:\n        return response(message=\"Client deleted!\",data=None)\n    raise DeleteClientException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=\"Something went wrong while deleting the client!\")",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -643,6 +679,15 @@
         "importPath": "api.user.services",
         "description": "api.user.services",
         "peekOfCode": "def add_new_client_service(client_name,db):\n    #check that client already exists\n    result = getcliet_based_on_name(client_name,db=db)\n    if result is False:\n        raise AddClientexception(status_code=status.HTTP_404_NOT_FOUND,detail=\"User already exists\")\n    #genarate key for the client\n    key = uuid.uuid4().hex.upper()[0:6]\n    client_name[\"key\"] = key\n    #add client to the system\n    result = add_client_to_system(client=client_name,db=db)",
+        "detail": "api.user.services",
+        "documentation": {}
+    },
+    {
+        "label": "delete_client_service",
+        "kind": 2,
+        "importPath": "api.user.services",
+        "description": "api.user.services",
+        "peekOfCode": "def delete_client_service(id,db):\n    #check that id is a valid id\n    try:\n        id = uuid.UUID(id)\n    except ValueError:\n        raise DeleteClientException(status_code=status.HTTP_400_BAD_REQUEST,detail=\"Malforemed client id.\")\n    #check that id exists on the database\n    result = check_client_repo_by_id(id=id,db=db)\n    if result:\n        deleted = delete_client_based_on_id(id=id,db=db)",
         "detail": "api.user.services",
         "documentation": {}
     },

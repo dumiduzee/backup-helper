@@ -1,8 +1,8 @@
 from fastapi import Depends,APIRouter,status,Request
 from ...limiter import limiter  # <-- updated import
-from .exceptions import (AddClientexception, ConfigCreationException, DeleteConfigException,
+from .exceptions import (AddClientexception, ConfigCreationException, DeleteClientException, DeleteConfigException,
     ValueErrorr)
-from .services import (add_new_client_service, create_config_service, delete_config_service,
+from .services import (add_new_client_service, create_config_service, delete_client_service, delete_config_service,
     get_configs_service, login_service)
 from ..db import get_db
 from .schemas import AddNewClientSchema, ConfigCreateSchema, LoginInputSchema, response
@@ -81,3 +81,13 @@ def add_client(request:Request,client_name:AddNewClientSchema,db:Annotated[Clien
     if result:
         return response(message="client added!",data=None)
     raise AddClientexception(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Something went wrong in our side")
+
+
+#delete specific user from the system
+@admin_router.delete("/delete-client/{id}")
+@limiter.limit("2/minute")
+def delete_client(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):
+    result = delete_client_service(id,db)
+    if result:
+        return response(message="Client deleted!",data=None)
+    raise DeleteClientException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="Something went wrong while deleting the client!")

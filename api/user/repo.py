@@ -60,4 +60,22 @@ def add_client_to_system(client,db:Client):
     if len(result.data) == 0:
         return False
     return True
+
+#check client availability based on id
+def check_client_repo_by_id(id,db:Client):
+    q = db.table("users").select("*").eq("id",id)
+    result = q.execute()
+    if len(result.data) == 0:
+        return None
+    else:
+        return True
+
+#delete client based on id
+def delete_client_based_on_id(id,db:Client):
+    q = db.table("users").delete().eq("id",id)
+    result = q.execute()
+    if len(result.data) == 0:
+        return None
+    else:
+        return True
     
