@@ -1,6 +1,7 @@
-from pydantic import BaseModel,field_validator
+from pydantic import BaseModel,field_validator,Field
 from .exceptions import ValueErrorr
 
+#Schema for the login data
 class LoginInputSchema(BaseModel):
     login_key : str 
     @field_validator("login_key")
@@ -11,3 +12,8 @@ class LoginInputSchema(BaseModel):
         if len(v) < 8:
             raise ValueErrorr(detail="Seems to be a invalid login key")
         return v
+
+#schema for admin's config creation process
+class ConfigCreateSchema(BaseModel):
+    config_name : str = Field(...,examples=["Airtel"])
+    config : str = Field(...,examples=["vless:://....."])

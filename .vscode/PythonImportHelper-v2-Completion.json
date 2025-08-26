@@ -164,6 +164,14 @@
         "documentation": {}
     },
     {
+        "label": "Field",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
         "label": "BaseSettings",
         "importPath": "pydantic_settings",
         "description": "pydantic_settings",
@@ -377,6 +385,15 @@
         "importPath": "api.user.schemas",
         "description": "api.user.schemas",
         "peekOfCode": "class LoginInputSchema(BaseModel):\n    login_key : str \n    @field_validator(\"login_key\")\n    @classmethod\n    def validate_login_key(cls,v):\n        if len(v) == 0:\n            raise ValueErrorr(detail=\"Login key cannot be empty\")\n        if len(v) < 8:\n            raise ValueErrorr(detail=\"Seems to be a invalid login key\")\n        return v",
+        "detail": "api.user.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "ConfigCreateSchema",
+        "kind": 6,
+        "importPath": "api.user.schemas",
+        "description": "api.user.schemas",
+        "peekOfCode": "class ConfigCreateSchema(BaseModel):\n    config_name : str = Field(...,examples=[\"Airtel\"])\n    config : str = Field(...,examples=[\"vless:://.....\"])",
         "detail": "api.user.schemas",
         "documentation": {}
     },
