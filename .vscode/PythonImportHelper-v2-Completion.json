@@ -60,14 +60,6 @@
         "documentation": {}
     },
     {
-        "label": "APIRouter",
-        "importPath": "fastapi",
-        "description": "fastapi",
-        "isExtraImport": true,
-        "detail": "fastapi",
-        "documentation": {}
-    },
-    {
         "label": "Depends",
         "importPath": "fastapi",
         "description": "fastapi",
@@ -76,7 +68,31 @@
         "documentation": {}
     },
     {
+        "label": "APIRouter",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
         "label": "Request",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "status",
         "importPath": "fastapi",
         "description": "fastapi",
         "isExtraImport": true,
@@ -177,6 +193,15 @@
         "description": "pydantic",
         "isExtraImport": true,
         "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "uuid",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "uuid",
+        "description": "uuid",
+        "detail": "uuid",
         "documentation": {}
     },
     {
@@ -338,7 +363,7 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)\n#config creation exceptions\nclass ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class UnauthorizedKey(HTTPException):\n    def __init__(self, status_code=status.HTTP_401_UNAUTHORIZED, detail = None):\n        super().__init__(status_code, detail)\n#config creation exceptions\nclass ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)\n#delete config exceptions\nclass DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -347,7 +372,16 @@
         "kind": 6,
         "importPath": "api.user.exceptions",
         "description": "api.user.exceptions",
-        "peekOfCode": "class ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)",
+        "peekOfCode": "class ConfigCreationException(HTTPException):\n    def __init__(self, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail = \"Something went wrong\"):\n        super().__init__(status_code, detail)\n#delete config exceptions\nclass DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
+        "detail": "api.user.exceptions",
+        "documentation": {}
+    },
+    {
+        "label": "DeleteConfigException",
+        "kind": 6,
+        "importPath": "api.user.exceptions",
+        "description": "api.user.exceptions",
+        "peekOfCode": "class DeleteConfigException(HTTPException):\n    def __init__(self, status_code=None, detail = None):\n        super().__init__(status_code, detail)",
         "detail": "api.user.exceptions",
         "documentation": {}
     },
@@ -374,7 +408,25 @@
         "kind": 2,
         "importPath": "api.user.repo",
         "description": "api.user.repo",
-        "peekOfCode": "def get_configs_repo(db:Client):\n    quesry = db.table(\"configs\").select(\"*\")\n    result = quesry.execute()\n    return result",
+        "peekOfCode": "def get_configs_repo(db:Client):\n    quesry = db.table(\"configs\").select(\"*\")\n    result = quesry.execute()\n    return result\n#check config availability based on id\ndef check_config_repo_by_id(id,db:Client):\n    q = db.table(\"configs\").select(\"\").eq(\"id\",id)\n    result = q.execute()\n    if len(result.data) == 0:\n        return None",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "check_config_repo_by_id",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def check_config_repo_by_id(id,db:Client):\n    q = db.table(\"configs\").select(\"\").eq(\"id\",id)\n    result = q.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return True\n#delete config based on id\ndef delete_config_based_on_id(id,db:Client):\n    q = db.table(\"configs\").delete().eq(\"id\",id)",
+        "detail": "api.user.repo",
+        "documentation": {}
+    },
+    {
+        "label": "delete_config_based_on_id",
+        "kind": 2,
+        "importPath": "api.user.repo",
+        "description": "api.user.repo",
+        "peekOfCode": "def delete_config_based_on_id(id,db:Client):\n    q = db.table(\"configs\").delete().eq(\"id\",id)\n    result = q.execute()\n    if len(result.data) == 0:\n        return None\n    else:\n        return True",
         "detail": "api.user.repo",
         "documentation": {}
     },
@@ -401,7 +453,7 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def create_config(request:Request,config:ConfigCreateSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass config data to service layer\n    result = create_config_service(config=config.model_dump(),db=db)\n    if result:\n        return response(message=\"Config creation succuss!!\")\n    raise ConfigCreationException()\n#get all available configs\n@admin_router.get(\"/\")\n@limiter.limit(\"30/minute\")\ndef get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):",
+        "peekOfCode": "def create_config(request:Request,config:ConfigCreateSchema,db:Annotated[Client,Depends(get_db)]):\n    #pass config data to service layer\n    result = create_config_service(config=config.model_dump(),db=db)\n    if result:\n        return response(message=\"Config creation succuss!!\",data=None)\n    raise ConfigCreationException()\n#get all available configs\n@admin_router.get(\"/\")\n@limiter.limit(\"30/minute\")\ndef get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -410,7 +462,25 @@
         "kind": 2,
         "importPath": "api.user.routes",
         "description": "api.user.routes",
-        "peekOfCode": "def get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass\n    #pass request to service layer\n    result = get_configs_service(db=db)\n    if result:\n        return response(message=\"Configs fetch done\",data=result.data)\n    return response(message=\"No any available configs\")",
+        "peekOfCode": "def get_configs(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass\n    #pass request to service layer\n    result = get_configs_service(db=db)\n    if result:\n        return response(message=\"Configs fetch done\",data=result.data)\n    return response(message=\"No any available configs\")\n#delete specific config from the system\n@admin_router.delete(\"/:id\")\n@limiter.limit(\"30/minute\")",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "delete_configs",
+        "kind": 2,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "def delete_configs(request:Request,id:str,db:Annotated[Client,Depends(get_db)]):\n    result = delete_config_service(id,db)\n    if result:\n        return response(message=\"Config deleted!\",data=None)\n    raise DeleteConfigException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail=\"Something went wrong while deleting the config!\")\n#add new user to the system\n@admin_router.post(\"/add-client\")\n@limiter.limit(\"30/minute\")\ndef add_client(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass",
+        "detail": "api.user.routes",
+        "documentation": {}
+    },
+    {
+        "label": "add_client",
+        "kind": 2,
+        "importPath": "api.user.routes",
+        "description": "api.user.routes",
+        "peekOfCode": "def add_client(request:Request,db:Annotated[Client,Depends(get_db)]):\n    pass",
         "detail": "api.user.routes",
         "documentation": {}
     },
@@ -491,7 +561,16 @@
         "kind": 2,
         "importPath": "api.user.services",
         "description": "api.user.services",
-        "peekOfCode": "def get_configs_service(db):\n    result = get_configs_repo(db=db)\n    if len(result.data) == 0:\n        return None\n    return result",
+        "peekOfCode": "def get_configs_service(db):\n    result = get_configs_repo(db=db)\n    if len(result.data) == 0:\n        return None\n    return result\n#delete specific config\ndef delete_config_service(id,db):\n    #check id is a valid id \n    try:\n        id = uuid.UUID(id)",
+        "detail": "api.user.services",
+        "documentation": {}
+    },
+    {
+        "label": "delete_config_service",
+        "kind": 2,
+        "importPath": "api.user.services",
+        "description": "api.user.services",
+        "peekOfCode": "def delete_config_service(id,db):\n    #check id is a valid id \n    try:\n        id = uuid.UUID(id)\n    except ValueError:\n        raise DeleteConfigException(status_code=status.HTTP_400_BAD_REQUEST,detail=\"Malforemed config id.\")\n    #first check that id exists on the database\n    result = check_config_repo_by_id(id=id,db=db)\n    #if available then delete it\n    if result:",
         "detail": "api.user.services",
         "documentation": {}
     },
